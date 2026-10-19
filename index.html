@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LA Agency · Social Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ────────── RESET & BASE ────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Red Hat Display', sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      overflow-x: hidden;
+    }
+
+    /* ────────── SCROLLBAR ────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #fff; border-radius: 2px; }
+
+    /* ────────── LOADING ────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.06), transparent 70%),
+        #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: inset(0 0 0 0);
+      transition: clip-path 0.8s cubic-bezier(0.76,0,0.24,1);
+    }
+    #loader.hidden {
+      clip-path: inset(0 0 100% 0);
+      pointer-events: none;
+    }
+    #loader.hidden .loader-inner {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    .loader-inner {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      transition: opacity 0.4s ease, transform 0.6s ease;
+    }
+    .loader-logo {
+      width: min(260px, 42vw);
+      filter: brightness(0) invert(1);
+      opacity: 0;
+      transform: translateX(-24px);
+      animation: loaderIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.05s forwards;
+    }
+    .loader-divider {
+      width: 1px;
+      height: 0;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
+      animation: loaderLine 0.5s ease 0.2s forwards;
+    }
+    .loader-info {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 150px;
+      opacity: 0;
+      transform: translateX(24px);
+      animation: loaderIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.15s forwards;
+    }
+    .loader-count {
+      font-size: clamp(2.6rem, 7vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .loader-count small {
+      font-size: 0.4em;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      margin-left: 4px;
+    }
+    .loader-bar-track {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.8);
+      border-radius: 2px;
+    }
+    .loader-caption {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    @keyframes loaderIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes loaderLine {
+      to { height: 110px; }
+    }
+    @media (max-width: 600px) {
+      .loader-inner { flex-direction: column; gap: 28px; }
+      .loader-logo { width: min(240px, 65vw); }
+      .loader-divider { display: none; }
+      .loader-info { align-items: center; width: min(240px, 65vw); }
+    }
+
+    /* ────────── CLIENTES ────────── */
+    #clientes {
+      position: relative;
+      background: rgba(8,8,8,0.6);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    #clientes::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.06), transparent 70%);
+      pointer-events: none;
+    }
+    .clientes-header {
+      position: relative;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto 64px;
+    }
+    .clientes-header .section-desc { margin: 20px auto 0; }
+    .clientes-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .cliente-card {
+      --x: 50%; --y: 50%;
+      position: relative;
+      padding: 14px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s;
+      overflow: hidden;
+    }
+    .cliente-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(400px circle at var(--x) var(--y), rgba(255,255,255,0.12), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .cliente-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .cliente-card:hover::before { opacity: 1; }
+    .cliente-tile {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: #fff;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      overflow: hidden;
+    }
+    .cliente-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+    .cliente-card:hover .cliente-logo { transform: scale(1.06); }
+    .cliente-meta {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 10px 8px;
+    }
+    .cliente-name {
+      display: block;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+    .cliente-desc {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.5);
+    }
+    .cliente-index { padding-top: 4px; }
+    .cliente-results {
+      position: relative;
+      margin: 10px 10px 6px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cliente-result {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+    .cliente-result-num {
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      white-space: nowrap;
+    }
+    .cliente-result-num .arrow { color: rgba(255,255,255,0.3); }
+    .cliente-result-label { color: rgba(255,255,255,0.4); }
+    .cliente-result-note {
+      margin-top: 2px;
+      font-size: 0.75rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.4);
+    }
+    .cliente-index {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.35);
+    }
+    .clientes-more {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin-top: 48px;
+    }
+    .clientes-more > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      font-size: 0.74rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+    }
+    .clientes-more strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+    .clientes-more .dot {
+      flex: none;
+      width: 4px; height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @media (max-width: 900px) {
+      .clientes-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    }
+
+    /* ────────── NAV ────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 72px;
+      background: rgba(10,10,10,0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.95);
+    }
+
+    nav { justify-content: flex-end; }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: relative;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      background: #fff;
+      color: #0a0a0a !important;
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-weight: 600 !important;
+      transition: background 0.3s, color 0.3s !important;
+    }
+    .nav-cta:hover { background: #e0e0e0 !important; }
+    .nav-cta::after { display: none !important; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 72px; left: 0; right: 0; bottom: 0;
+      background: #0a0a0a;
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* ────────── HERO ────────── */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 150px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid background */
+    #home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+      animation: gridMove 6s linear infinite;
+    }
+    @keyframes gridMove {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 0 80px, 80px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #home::before { animation: none; }
+    }
+
+    /* Glowing orb */
+    #home::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px;
+      padding: 8px 18px;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 40px;
+      backdrop-filter: blur(8px);
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero-logo {
+      width: min(460px, 75vw);
+      margin-bottom: 40px;
+      animation: fadeUp 0.8s 0.1s ease both;
+      filter: brightness(0) invert(1);
+    }
+
+    h1.hero-title {
+      font-size: clamp(2.4rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+    h1.hero-title em {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,0.45);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 52px;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      z-index: 1;
+      animation: fadeUp 1s 0.6s ease both;
+      transition: color 0.3s;
+    }
+    .scroll-indicator:hover { color: #fff; }
+    .scroll-indicator span {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      position: relative;
+      width: 1px;
+      height: 56px;
+      background: rgba(255,255,255,0.15);
+      overflow: hidden;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute;
+      left: 0; top: -40%;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent, #fff);
+      animation: scrollDrop 1.8s cubic-bezier(0.65,0,0.35,1) infinite;
+    }
+    @keyframes scrollDrop {
+      0%   { top: -40%; }
+      100% { top: 100%; }
+    }
+    .scroll-arrow {
+      animation: scrollBounce 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50%      { transform: translateY(6px); opacity: 1; }
+    }
+
+    /* ────────── SECTION BASE ────────── */
+    section { padding: 120px 24px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    h2.section-title {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    h2.section-title em {
+      color: rgba(255,255,255,0.4);
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.75;
+      max-width: 580px;
+    }
+
+    /* ────────── DIVIDER ────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ────────── SOBRE ────────── */
+    #sobre { background: rgba(13,13,13,0.6); }
+
+    .sobre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .sobre-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 48px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 28px 24px;
+      transition: background 0.3s;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.07); }
+    .stat-card:first-child { border-radius: 20px 0 0 20px; }
+    .stat-card:last-child { border-radius: 0 20px 20px 0; }
+
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sobre-visual {
+      position: relative;
+    }
+    .office {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      aspect-ratio: 4 / 5;
+      max-width: 520px;
+      margin-left: auto;
+      background: #0f0e0d;
+    }
+    .office-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      transition: transform 1.2s cubic-bezier(0.22,1,0.36,1);
+    }
+    .office:hover .office-photo { transform: scale(1.04); }
+    @media (max-width: 900px) {
+      .office { margin: 0 auto; }
+    }
+
+    /* ────────── O QUE FAZEMOS ────────── */
+    #servicos {
+      background: rgba(10,10,10,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    #servicos::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .servicos-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 80px;
+      gap: 40px;
+    }
+
+    .servicos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+    }
+
+    .servico-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 52px 48px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s;
+      cursor: default;
+    }
+    .servico-card:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .servico-card:nth-child(1) { border-radius: 24px 0 0 0; }
+    .servico-card:nth-child(2) { border-radius: 0 24px 0 0; }
+    .servico-card:nth-child(3) { border-radius: 0 0 0 24px; }
+    .servico-card:nth-child(4) { border-radius: 0 0 24px 0; }
+
+    .servico-number {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .servico-icon {
+      margin-bottom: 20px;
+      display: block;
+      width: 36px;
+      height: 36px;
+    }
+    .servico-icon svg { display: block; }
+    .icon-diamond {
+      fill: none;
+      stroke: rgba(255,255,255,0.65);
+      stroke-width: 2;
+      transition: fill 0.35s ease, stroke 0.35s ease;
+    }
+    .servico-card:hover .icon-diamond {
+      fill: rgba(255,255,255,0.95);
+      stroke: rgba(255,255,255,0.95);
+    }
+    .servico-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+    }
+    .servico-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .servico-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+    }
+    .servico-list li::before {
+      content: '●';
+      font-size: 0.4rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    /* hover line top accent */
+    .servico-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: #fff;
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+    .servico-card:hover::after { transform: scaleX(1); }
+
+    /* ────────── PARCERIA ────────── */
+    #parceria {
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,0.85) 0%, rgba(5,5,5,0.4) 45%, rgba(5,5,5,0.15) 100%),
+        url('parceria-fundo.webp') right center / cover no-repeat,
+        #050505;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .parceria-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .parceria-text .section-desc {
+      color: rgba(255,255,255,0.85);
+      max-width: 560px;
+    }
+    .parceria-text .section-desc + .section-desc { margin-top: 18px; }
+    .parceria-cta { margin-top: 40px; }
+
+    .parceria-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 14px;
+    }
+    .ptag {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 22px;
+      border-radius: 100px;
+      background: rgba(10,10,10,0.45);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 1rem;
+      font-weight: 400;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    .ptag:nth-child(2) { margin-right: 48px; transition-delay: 0.18s; }
+    .ptag:nth-child(3) { transition-delay: 0.36s; }
+    .parceria-stage.in-view .ptag { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ptag { opacity: 1; transform: none; transition: none; }
+    }
+
+    @media (max-width: 900px) {
+      .parceria-grid { grid-template-columns: 1fr; gap: 40px; }
+      #parceria {
+        background:
+          linear-gradient(180deg, rgba(5,5,5,0.88) 0%, rgba(5,5,5,0.7) 55%, rgba(5,5,5,0.35) 100%),
+          url('parceria-fundo.webp') 70% center / cover no-repeat,
+          #050505;
+      }
+      .parceria-stage { align-items: flex-start; }
+      .ptag:nth-child(2) { margin-right: 0; }
+      .ptag { font-size: 0.95rem; padding: 12px 18px; }
+    }
+
+    /* ────────── FAQ ────────── */
+    #faq { background: rgba(13,13,13,0.6); }
+
+    .faq-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .faq-item:first-child {
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #fff;
+      font-family: 'Red Hat Display', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 24px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      line-height: 1.4;
+      transition: color 0.3s;
+    }
+    .faq-question:hover { color: rgba(255,255,255,0.75); }
+
+    .faq-icon {
+      width: 22px;
+      height: 22px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .faq-icon svg {
+      transition: transform 0.35s ease;
+    }
+    .faq-item.open .faq-icon {
+      background: #fff;
+      border-color: #fff;
+    }
+    .faq-item.open .faq-icon svg {
+      transform: rotate(45deg);
+    }
+    .faq-item.open .faq-icon path {
+      stroke: #0a0a0a;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+    .faq-answer-inner {
+      padding-bottom: 24px;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.75;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 400px;
+    }
+
+    .faq-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 2px;
+      transition: border-color 0.3s;
+    }
+    .faq-cta:hover { border-color: #fff; }
+
+    @media (max-width: 900px) {
+      .faq-inner { grid-template-columns: 1fr; gap: 48px; }
+    }
+
+    /* ────────── CONTATO ────────── */
+    #contato {
+      background: rgba(10,10,10,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    #contato::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .contato-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .contato-info {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .contato-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .contato-item-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .contato-item-value {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+    }
+    .contato-item-value a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      transition: border-color 0.2s;
+    }
+    .contato-item-value a:hover { border-color: #fff; }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .social-link:hover {
+      border-color: #fff;
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* Form */
+    .contato-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: 'Red Hat Display', sans-serif;
+      font-size: 0.92rem;
+      color: #fff;
+      transition: border-color 0.3s, background 0.3s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.07);
+    }
+    .form-group select option { background: #1a1a1a; }
+    .form-group textarea { resize: vertical; min-height: 140px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .btn-submit {
+      background: #fff;
+      color: #0a0a0a;
+      border: none;
+      padding: 18px 40px;
+      border-radius: 100px;
+      font-family: 'Red Hat Display', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      align-self: flex-start;
+      letter-spacing: 0.02em;
+    }
+    .btn-submit:hover { background: #e8e8e8; transform: translateY(-2px); }
+
+    /* ────────── FOOTER ────────── */
+    footer {
+      background: rgba(6,6,6,0.6);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 24px;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-logo { height: 64px; width: auto; filter: brightness(0) invert(1); }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.25);
+    }
+    .footer-links {
+      display: flex;
+      gap: 28px;
+    }
+    .footer-links a {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: #fff; }
+
+    /* ────────── ANIMATIONS ────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ────────── MARQUEE ────────── */
+    .marquee-wrapper {
+      overflow: hidden;
+      padding: 20px 0;
+      background: #fff;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 60px;
+      animation: marquee 25s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      white-space: nowrap;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #0a0a0a;
+    }
+    .marquee-item .star { color: #0a0a0a; font-size: 0.7rem; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ────────── RESPONSIVE ────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      .sobre-grid,
+      .contato-inner { grid-template-columns: 1fr; gap: 48px; }
+
+      .servicos-header { flex-direction: column; align-items: flex-start; }
+
+      .servicos-grid { grid-template-columns: 1fr; }
+      .servico-card:nth-child(1),
+      .servico-card:nth-child(2),
+      .servico-card:nth-child(3),
+      .servico-card:nth-child(4) { border-radius: 20px; }
+
+      .form-row { grid-template-columns: 1fr; }
+
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 600px) {
+      section { padding: 80px 20px; }
+      .sobre-stats { grid-template-columns: 1fr; }
+      .stat-card:first-child { border-radius: 20px 20px 0 0; }
+      .stat-card:last-child { border-radius: 0 0 20px 20px; }
+    }
+
+    /* ────────── ESTRELAS DE FUNDO ────────── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    section, footer, .marquee-wrapper { position: relative; z-index: 1; }
+
+    /* ────────── WHATSAPP ────────── */
+    .wa-float {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 1500;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 14px;
+    }
+    .wa-btn {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #25d366;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(37,211,102,0.35);
+      transition: transform 0.3s ease;
+    }
+    .wa-btn:hover { transform: scale(1.08); }
+    .wa-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #25d366;
+      z-index: -1;
+      animation: waRing 2.4s ease-out infinite;
+    }
+    @keyframes waRing {
+      0%   { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+    .wa-badge {
+      position: absolute;
+      top: -2px; right: -2px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #ff3b30;
+      border: 2px solid #0a0a0a;
+      font-size: 0.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .wa-float.has-msg .wa-badge { transform: scale(1); }
+
+    .wa-popup {
+      width: min(320px, calc(100vw - 48px));
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+      transform-origin: bottom right;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .wa-popup.show {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+    .wa-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #1c1c1c;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .wa-avatar {
+      position: relative;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+    .wa-avatar img { width: 26px; filter: brightness(0) invert(1); }
+    .wa-avatar::after {
+      content: '';
+      position: absolute;
+      right: 0; bottom: 0;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #25d366;
+      border: 2px solid #1c1c1c;
+    }
+    .wa-name { font-weight: 700; font-size: 0.9rem; }
+    .wa-status { font-size: 0.72rem; color: #25d366; }
+    .wa-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .wa-close:hover { color: #fff; }
+    .wa-body { padding: 18px 16px 16px; }
+    .wa-bubble {
+      position: relative;
+      background: #222;
+      border-radius: 4px 16px 16px 16px;
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.88);
+    }
+    .wa-time {
+      display: block;
+      text-align: right;
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 4px;
+    }
+    .wa-typing {
+      display: inline-flex;
+      gap: 4px;
+      padding: 14px;
+      background: #222;
+      border-radius: 4px 16px 16px 16px;
+    }
+    .wa-typing[hidden], .wa-bubble[hidden] { display: none; }
+    .wa-typing span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      animation: waDots 1s infinite;
+    }
+    .wa-typing span:nth-child(2) { animation-delay: 0.15s; }
+    .wa-typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes waDots {
+      0%, 100% { transform: translateY(0); opacity: 0.4; }
+      50%      { transform: translateY(-4px); opacity: 1; }
+    }
+    .wa-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 100px;
+      background: #25d366;
+      color: #0a0a0a;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .wa-cta:hover { background: #2ee676; transform: translateY(-1px); }
+    @media (max-width: 600px) {
+      .wa-float { right: 16px; bottom: 16px; }
+      .wa-btn { width: 54px; height: 54px; }
+    }
+    /* ────────── TIPOGRAFIA DE TÍTULOS ────────── */
+    h1.hero-title,
+    h2.section-title,
+    .stat-number,
+    .loader-count,
+    .servico-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.005em;
+    }
+    h1.hero-title {
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      line-height: 1;
+    }
+    h2.section-title {
+      font-size: clamp(2rem, 3.8vw, 3.4rem);
+      line-height: 1;
+    }
+    h1.hero-title em,
+    h2.section-title em {
+      font-family: inherit;
+      font-style: normal;
+    }
+    .stat-number { font-size: 3.4rem; }
+    .servico-title { font-size: 2rem; }
+
+    /* ────────── AJUSTES MOBILE ────────── */
+    h1.hero-title, h2.section-title { text-wrap: balance; }
+    @media (max-width: 600px) {
+      #home { min-height: 100svh; padding: 100px 20px 140px; }
+      .hero-badge { margin-bottom: 28px; font-size: 0.64rem; padding: 7px 14px; }
+      .hero-logo { width: min(240px, 60vw); margin-bottom: 28px; }
+      h1.hero-title { font-size: 2.3rem; margin-bottom: 20px; }
+      .hero-sub { font-size: 0.98rem; margin-bottom: 0; }
+      .scroll-indicator { bottom: 24px; }
+
+      .sobre-stats { grid-template-columns: repeat(3, 1fr); margin-top: 36px; }
+      .stat-card { padding: 20px 12px; text-align: center; }
+      .stat-card:first-child { border-radius: 16px 0 0 16px; }
+      .stat-card:last-child { border-radius: 0 16px 16px 0; }
+      .stat-number { font-size: 2.2rem; }
+      .stat-label { font-size: 0.6rem; letter-spacing: 0.04em; }
+
+      .ptag {
+        padding: 4px 0 4px 14px;
+        border: none;
+        border-left: 2px solid rgba(255,255,255,0.35);
+        border-radius: 0;
+        background: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        font-size: 0.95rem;
+      }
+      .parceria-stage { gap: 14px; }
+
+      .servico-card { padding: 32px 26px; }
+      .servico-title { margin-bottom: 18px; }
+
+      .cliente-tile { aspect-ratio: 16 / 10; padding: 24px; }
+
+      input, select, textarea { font-size: 16px !important; }
+    }
+    .form-honey { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  </style></head>
+<body>
+
+  <!-- ── ESTRELAS DE FUNDO ── -->
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+  <!-- ── LOADER ── -->
+  <div id="loader">
+    <div class="loader-inner">
+      <img src="logo.png" alt="LA Agency" class="loader-logo" />
+      <span class="loader-divider"></span>
+      <div class="loader-info">
+        <div class="loader-count"><span id="loaderCount">0</span><small>%</small></div>
+        <div class="loader-bar-track">
+          <div class="loader-bar-fill" id="loaderBar"></div>
+        </div>
+        <span class="loader-caption">Carregando</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NAV ── -->
+  <nav id="navbar">
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#servicos">O que fazemos</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contato" class="nav-cta">Contato</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home" onclick="closeMenu()">Home</a>
+    <a href="#sobre" onclick="closeMenu()">Sobre</a>
+    <a href="#servicos" onclick="closeMenu()">O que fazemos</a>
+    <a href="#contato" onclick="closeMenu()">Contato</a>
+    <a href="#faq" onclick="closeMenu()">FAQ</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section id="home">
+    <span class="hero-badge"><span class="dot"></span>Sua agência preferida chegou!</span>
+    <img src="logo.png" alt="LA Agency" class="hero-logo" />
+    <h1 class="hero-title">
+      Transformamos marcas em<br/><em>referências digitais</em>
+    </h1>
+    <p class="hero-sub">
+      Estratégia, branding, conteúdo e performance para marcas que querem se destacar nas redes sociais.
+    </p>
+    <a href="#sobre" class="scroll-indicator" aria-label="Rolar para baixo">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+      <svg class="scroll-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </a>
+  </section>
+
+  <!-- ── MARQUEE ── -->
+  <div class="marquee-wrapper">
+    <div class="marquee-track">
+      <span class="marquee-item">Estratégia Digital <span class="star">✦</span></span>
+      <span class="marquee-item">Branding <span class="star">✦</span></span>
+      <span class="marquee-item">Criação de Conteúdo <span class="star">✦</span></span>
+      <span class="marquee-item">Performance <span class="star">✦</span></span>
+      <span class="marquee-item">Social Media <span class="star">✦</span></span>
+      <span class="marquee-item">Gestão de Comunidade <span class="star">✦</span></span>
+      <span class="marquee-item">Identidade Visual <span class="star">✦</span></span>
+      <span class="marquee-item">Consultoria <span class="star">✦</span></span>
+      <!-- duplicate for seamless loop -->
+      <span class="marquee-item">Estratégia Digital <span class="star">✦</span></span>
+      <span class="marquee-item">Branding <span class="star">✦</span></span>
+      <span class="marquee-item">Criação de Conteúdo <span class="star">✦</span></span>
+      <span class="marquee-item">Performance <span class="star">✦</span></span>
+      <span class="marquee-item">Social Media <span class="star">✦</span></span>
+      <span class="marquee-item">Gestão de Comunidade <span class="star">✦</span></span>
+      <span class="marquee-item">Identidade Visual <span class="star">✦</span></span>
+      <span class="marquee-item">Consultoria <span class="star">✦</span></span>
+    </div>
+  </div>
+
+  <!-- ── SOBRE ── -->
+  <section id="sobre">
+    <div class="container">
+      <div class="sobre-grid">
+        <!-- Left -->
+        <div class="reveal">
+          <span class="section-label">Sobre nós</span>
+          <h2 class="section-title">Uma agência feita para <em>marcas que querem mais</em></h2>
+          <p class="section-desc">
+            A LA Agency é uma nova agência remota, nascida em Pindamonhangaba, no coração do Vale do Paraíba, e especializada em social media. Unimos estratégia, criatividade e dados para transformar a presença digital das marcas, onde quer que elas estejam.
+          </p>
+          <p class="section-desc" style="margin-top:16px; color:#fff">
+            Acreditamos que cada post é uma oportunidade de conexão real. Aquela história de <strong style="color:#fff">postar por postar</strong>? Definitivamente não é com a gente.
+          </p>
+          <div class="sobre-stats">
+            <div class="stat-card">
+              <div class="stat-number">+30</div>
+              <div class="stat-label">Clientes já atendidos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">+50</div>
+              <div class="stat-label">Campanhas executadas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">+3M</div>
+              <div class="stat-label">Impressões geradas</div>
+            </div>
+          </div>
+        </div>
+        <!-- Right -->
+        <div class="sobre-visual reveal" style="transition-delay: 0.15s">
+          <div class="office">
+            <img src="escritorio-la.webp" alt="Escritório da LA Agency com a logo na parede" class="office-photo" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PARCERIA ── -->
+  <section id="parceria">
+    <div class="container">
+      <div class="parceria-grid">
+        <div class="parceria-text reveal">
+          <span class="section-label">Parceria de verdade</span>
+          <h2 class="section-title">Quem conhece a LA.<br/><em>Contrata a LA.</em></h2>
+          <p class="section-desc">
+            Pra gente, cliente não é só mais um número. A LA não é apenas uma agência, é parceira: a gente mergulha no seu negócio, entende seus objetivos e vira o seu braço direito no digital.
+          </p>
+          <p class="section-desc">
+            Respeitamos o seu tempo, o seu briefing e cada real investido na sua marca. Nada de entrega no automático: cada decisão é pensada para gerar resultado e fazer a sua marca crescer junto com a gente.
+          </p>
+          <a class="social-link parceria-cta" href="https://wa.me/5513992045566?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20LA%20Agency%20e%20gostaria%20de%20saber%20mais." target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Falar com a LA
+          </a>
+        </div>
+        <div class="parceria-stage" id="parceriaStage">
+          <span class="ptag">Estratégia que gera resultado</span>
+          <span class="ptag">Time que faz acontecer</span>
+          <span class="ptag">Seu braço direito no digital</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── O QUE FAZEMOS ── -->
+  <section id="servicos">
+    <div class="container">
+      <div class="servicos-header reveal">
+        <div>
+          <span class="section-label">O que fazemos</span>
+          <h2 class="section-title">Tudo que sua marca<br/><em>precisa crescer</em></h2>
+        </div>
+        <p class="section-desc">
+          Quatro pilares integrados para uma presença digital completa, consistente e que converte.
+        </p>
+      </div>
+
+      <div class="servicos-grid">
+        <!-- 01 Estratégia -->
+        <div class="servico-card reveal">
+          <div class="servico-number">01 Estratégia</div>
+          <span class="servico-icon">
+            <svg viewBox="0 0 40 40" width="36" height="36"><polygon class="icon-diamond" points="20,2 38,20 20,38 2,20"/></svg>
+          </span>
+          <h3 class="servico-title">Estratégia</h3>
+          <ul class="servico-list">
+            <li>Diagnóstico de marca e concorrência</li>
+            <li>Posicionamento nas redes</li>
+            <li>Planejamento estratégico e editorial</li>
+            <li>Definição de canais e indicadores</li>
+            <li>Consultoria estratégica contínua</li>
+          </ul>
+        </div>
+
+        <!-- 02 Branding -->
+        <div class="servico-card reveal" style="transition-delay:0.1s">
+          <div class="servico-number">02 Branding</div>
+          <span class="servico-icon">
+            <svg viewBox="0 0 40 40" width="36" height="36"><polygon class="icon-diamond" points="20,2 38,20 20,38 2,20"/></svg>
+          </span>
+          <h3 class="servico-title">Branding</h3>
+          <ul class="servico-list">
+            <li>Tom de voz e linguagem</li>
+            <li>Identidade visual para redes</li>
+            <li>Territórios e pilares de marca</li>
+            <li>Guia de marca para redes sociais</li>
+          </ul>
+        </div>
+
+        <!-- 03 Conteúdo -->
+        <div class="servico-card reveal" style="transition-delay:0.2s">
+          <div class="servico-number">03 Conteúdo</div>
+          <span class="servico-icon">
+            <svg viewBox="0 0 40 40" width="36" height="36"><polygon class="icon-diamond" points="20,2 38,20 20,38 2,20"/></svg>
+          </span>
+          <h3 class="servico-title">Conteúdo</h3>
+          <ul class="servico-list">
+            <li>Criação e redação</li>
+            <li>Design</li>
+            <li>Vídeos, reels, filmagem e fotografia</li>
+            <li>Gestão de comunidade</li>
+          </ul>
+        </div>
+
+        <!-- 04 Performance -->
+        <div class="servico-card reveal" style="transition-delay:0.3s">
+          <div class="servico-number">04 Performance</div>
+          <span class="servico-icon">
+            <svg viewBox="0 0 40 40" width="36" height="36"><polygon class="icon-diamond" points="20,2 38,20 20,38 2,20"/></svg>
+          </span>
+          <h3 class="servico-title">Performance</h3>
+          <ul class="servico-list">
+            <li>Campanhas com objetivos específicos</li>
+            <li>Otimização contínua</li>
+            <li>Relatórios de resultado</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLIENTES ── -->
+  <section id="clientes">
+    <div class="container">
+      <div class="clientes-header reveal">
+        <span class="section-label">Nossos clientes</span>
+        <h2 class="section-title">Eles já confiam em nosso trabalho e <em>estão crescendo junto!</em></h2>
+      </div>
+      <div class="clientes-grid">
+        <div class="cliente-card reveal">
+          <div class="cliente-tile"><img src="cliente-levida.png" alt="Clube Levida" class="cliente-logo" /></div>
+          <div class="cliente-meta"><div><span class="cliente-name">Clube Levida</span><span class="cliente-desc">Clube de benefícios</span></div><span class="cliente-index">01</span></div>
+        </div>
+        <div class="cliente-card reveal" style="transition-delay:0.1s">
+          <div class="cliente-tile"><img src="cliente-diabetes.png" alt="Diabetes, Eu Cuido" class="cliente-logo" /></div>
+          <div class="cliente-meta"><div><span class="cliente-name">Diabetes, Eu Cuido</span><span class="cliente-desc">Programa de diabetes</span></div><span class="cliente-index">02</span></div>
+          <div class="cliente-results">
+            <div class="cliente-result">
+              <span class="cliente-result-num">4k <span class="arrow">→</span> 13,5k</span>
+              <span class="cliente-result-label">seguidores em 4 meses</span>
+            </div>
+            <div class="cliente-result">
+              <span class="cliente-result-num">0 <span class="arrow">→</span> 4k</span>
+              <span class="cliente-result-label">seguidores no TikTok, começando do zero</span>
+            </div>
+            <p class="cliente-result-note">Audiência e comunidade que ficam.</p>
+          </div>
+        </div>
+        <div class="cliente-card reveal" style="transition-delay:0.2s">
+          <div class="cliente-tile"><img src="cliente-cedlab.png" alt="Cedlab Laboratórios" class="cliente-logo" /></div>
+          <div class="cliente-meta"><div><span class="cliente-name">Cedlab Laboratórios</span><span class="cliente-desc">Laboratório de análises clínicas, com 3 unidades no Vale do Paraíba</span></div><span class="cliente-index">03</span></div>
+        </div>
+      </div>
+      <div class="clientes-more reveal">
+        <span><span class="dot"></span><span>E mais de <strong>30 marcas</strong> já atendidas</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTATO ── -->
+  <section id="contato">
+    <div class="container">
+      <div class="contato-inner">
+        <!-- Left -->
+        <div class="reveal">
+          <span class="section-label">Contato</span>
+          <h2 class="section-title">Vamos construir algo <em>incrível</em> juntos?</h2>
+          <p class="section-desc" style="margin-bottom:48px">
+            Pronto para levar sua marca para o próximo nível? Entre em contato e vamos conversar sobre o seu projeto.
+          </p>
+
+          <div class="contato-info">
+            <div class="contato-item">
+              <span class="contato-item-label">E-mail</span>
+              <span class="contato-item-value">
+                <a href="mailto:laagencycontato@gmail.com">laagencycontato@gmail.com</a>
+              </span>
+            </div>
+            <div class="contato-item">
+              <span class="contato-item-label">WhatsApp</span>
+              <div class="social-links">
+              <a href="https://wa.me/5513992045566?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20LA%20Agency%20e%20gostaria%20de%20saber%20mais." target="_blank" rel="noopener" class="social-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                Chamar no WhatsApp
+              </a>
+              </div>
+            </div>
+            <div class="contato-item">
+              <span class="contato-item-label">Redes Sociais</span>
+              <div class="social-links">
+                <a href="https://www.instagram.com/lagency_mkt" target="_blank" class="social-link">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  @lagency_mkt
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right — Form -->
+        <div class="reveal" style="transition-delay:0.15s">
+          <form class="contato-form" onsubmit="handleSubmit(event)">
+            <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input id="nome" name="Nome" type="text" placeholder="Seu nome" required />
+              </div>
+              <div class="form-group">
+                <label for="empresa">Empresa</label>
+                <input id="empresa" name="Empresa" type="text" placeholder="Nome da empresa" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" placeholder="seu@email.com" required />
+            </div>
+            <div class="form-group">
+              <label for="servico">Interesse</label>
+              <select id="servico" name="Interesse">
+                <option value="">Selecione um serviço</option>
+                <option>Estratégia</option>
+                <option>Branding</option>
+                <option>Conteúdo</option>
+                <option>Performance</option>
+                <option>Projeto completo (360°)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="mensagem">Mensagem</label>
+              <textarea id="mensagem" name="Mensagem" placeholder="Conte-nos sobre o seu projeto..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Enviar mensagem →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="container">
+      <div class="faq-inner">
+        <!-- Left -->
+        <div class="reveal">
+          <span class="section-label">FAQ</span>
+          <h2 class="section-title">Perguntas <em>frequentes</em></h2>
+          <p class="section-desc" style="margin-top:12px">
+            Dúvidas comuns sobre a LA Agency e nossos serviços.
+          </p>
+        </div>
+
+        <!-- Right: accordion -->
+        <div class="faq-list reveal" style="transition-delay:0.15s">
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              A LA Agency é uma agência completa ou preciso contratar cada serviço separadamente?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                É uma agência completa. A divisão por serviços no site serve para mostrar o que fazemos, e não significa que cada frente seja contratada à parte. Empresas que já têm parte dessa estrutura internamente também podem contratar frentes específicas, como apenas a estratégia ou conteúdo.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              O que faz uma agência de social media?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                Planeja, produz e gerencia a presença de uma empresa nas redes sociais. O trabalho inclui diagnóstico, estratégia, linha editorial, criação de conteúdo, gestão de comunidade e análise de resultados, sempre ligado aos objetivos de negócio.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              A LA Agency é uma agência do interior de São Paulo? Atende outras cidades?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                Sim! A LA Agency nasceu em Pindamonhangaba, no interior de São Paulo, e trabalha de forma 100% remota. Por isso atendemos marcas de todo o Brasil e também clientes internacionais.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              A agência também faz mídia paga?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                Sim, realizamos mídia paga.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              A LA também faz sites completos e landing pages?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                Sim, a LA também fornece esse serviço específico para o que sua marca precisa.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              Como solicitar uma proposta?
+              <span class="faq-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M5 1V9M1 5H9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <div class="faq-answer-inner">
+                É bem simples! Basta preencher o formulário na seção de contato ou nos chamar diretamente pelo WhatsApp. Vamos entender o seu projeto e enviar uma proposta personalizada.<br/><br/>
+                <a href="#contato" class="faq-cta">Solicitar proposta →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <img src="logo-porta.png" alt="LA Agency" class="footer-logo" />
+      <span class="footer-copy">© 2026 LA Agency. Todos os direitos reservados.</span>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#contato">Contato</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── WHATSAPP ── -->
+  <div class="wa-float" id="waFloat">
+    <div class="wa-popup" id="waPopup" role="dialog" aria-label="Fale com a LA Agency no WhatsApp">
+      <div class="wa-head">
+        <div class="wa-avatar"><img src="logo-porta.png" alt="" /></div>
+        <div>
+          <div class="wa-name">LA Agency</div>
+          <div class="wa-status">online agora</div>
+        </div>
+        <button class="wa-close" id="waClose" aria-label="Fechar">×</button>
+      </div>
+      <div class="wa-body">
+        <div class="wa-typing" id="waTyping"><span></span><span></span><span></span></div>
+        <div class="wa-bubble" id="waBubble" hidden>
+          Oi! 👋 Que tal levar sua marca para o próximo nível? Chama a gente no WhatsApp, vamos adorar conversar com você!
+          <span class="wa-time" id="waTime"></span>
+        </div>
+        <a class="wa-cta" href="https://wa.me/5513992045566?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20LA%20Agency%20e%20gostaria%20de%20saber%20mais." target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.04 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.21-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.22 4.25-9.46 9.48-9.46a9.4 9.4 0 0 1 6.7 2.78 9.4 9.4 0 0 1 2.77 6.69c0 5.22-4.25 9.46-9.47 9.46zm8.06-17.52A11.32 11.32 0 0 0 12.04.64C5.76.64.66 5.74.66 12.01c0 2 .52 3.96 1.52 5.68L.57 23.36l5.8-1.52a11.36 11.36 0 0 0 5.67 1.45h.01c6.27 0 11.37-5.1 11.37-11.37 0-3.04-1.18-5.89-3.32-8.04z"/></svg>
+          Conversar no WhatsApp
+        </a>
+      </div>
+    </div>
+    <a class="wa-btn" id="waBtn" href="https://wa.me/5513992045566?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20LA%20Agency%20e%20gostaria%20de%20saber%20mais." target="_blank" rel="noopener" aria-label="Chamar no WhatsApp">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.04 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.21-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.22 4.25-9.46 9.48-9.46a9.4 9.4 0 0 1 6.7 2.78 9.4 9.4 0 0 1 2.77 6.69c0 5.22-4.25 9.46-9.47 9.46zm8.06-17.52A11.32 11.32 0 0 0 12.04.64C5.76.64.66 5.74.66 12.01c0 2 .52 3.96 1.52 5.68L.57 23.36l5.8-1.52a11.36 11.36 0 0 0 5.67 1.45h.01c6.27 0 11.37-5.1 11.37-11.37 0-3.04-1.18-5.89-3.32-8.04z"/></svg>
+      <span class="wa-badge">1</span>
+    </a>
+  </div>
+
+  <!-- ── JS ── -->
+  <script>
+    /* ── Sempre abrir no topo ── */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    document.documentElement.style.overflow = 'hidden';
+
+    /* ── Loader ── */
+    const loader = document.getElementById('loader');
+    const loaderCount = document.getElementById('loaderCount');
+    const loaderBar = document.getElementById('loaderBar');
+    const LOADER_MS = 1400;
+    const loaderStart = performance.now();
+    function tickLoader(now) {
+      const t = Math.min(1, (now - loaderStart) / LOADER_MS);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const pct = Math.round(eased * 100);
+      loaderCount.textContent = pct;
+      loaderBar.style.width = pct + '%';
+      if (t < 1) {
+        requestAnimationFrame(tickLoader);
+      } else {
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          document.documentElement.style.overflow = '';
+          loader.classList.add('hidden');
+          setTimeout(() => loader.remove(), 900);
+        }, 150);
+      }
+    }
+    requestAnimationFrame(tickLoader);
+
+    /* ── Clientes: brilho que segue o mouse ── */
+    document.querySelectorAll('.cliente-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--x', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--y', (e.clientY - r.top) + 'px');
+      });
+    });
+
+    /* ── Navbar scroll ── */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    /* ── Hamburger ── */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    function closeMenu() {
+      hamburger.classList.remove('active');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    /* ── Scroll reveal ── */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
+
+    /* ── Active nav link ── */
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current
+          ? '#fff'
+          : 'rgba(255,255,255,0.65)';
+      });
+    });
+
+    /* ── Form ── */
+    const FORM_ENDPOINT = 'https://formsubmit.co/ajax/laagencycontato@gmail.com';
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn = form.querySelector('.btn-submit');
+      if (form._honey.value) return; // robô de spam
+      const data = Object.fromEntries(new FormData(form));
+      delete data._honey;
+      data._subject = 'Novo contato pelo site — ' + (data.Nome || '');
+      data._template = 'table';
+      data._replyto = data.email;
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || String(out.success) === 'false') throw new Error(out.message || 'erro');
+        btn.textContent = 'Mensagem enviada ✓';
+        btn.style.background = '#e8e8e8';
+        form.reset();
+      } catch (err) {
+        btn.textContent = 'Não foi possível enviar. Tente pelo WhatsApp.';
+        btn.style.background = '#ffd6d6';
+      }
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = 'Enviar mensagem →';
+        btn.style.background = '#fff';
+      }, 4000);
+    }
+
+    /* ── FAQ accordion ── */
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      // close all
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      // open clicked if it was closed
+      if (!isOpen) item.classList.add('open');
+    }
+
+    /* ── Estrelas de fundo (mesmo formato ✦ da logo) ── */
+    (function () {
+      const canvas = document.getElementById('starfield');
+      const ctx = canvas.getContext('2d');
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let w = 0, h = 0, dpr = 1, stars = [];
+
+      function makeStar(randomY) {
+        const size = 3 + Math.pow(Math.random(), 2.2) * 11; // maioria pequena, algumas maiores
+        return {
+          x: Math.random() * w,
+          y: randomY ? Math.random() * h : h + 20,
+          size,
+          vy: -(0.08 + Math.random() * 0.25) * (size / 8 + 0.4),
+          vx: (Math.random() - 0.5) * 0.12,
+          rot: Math.random() * Math.PI,
+          vrot: (Math.random() - 0.5) * 0.004,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.6 + Math.random() * 1.6,
+          base: 0.25 + Math.random() * 0.5
+        };
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.round(Math.min(26, Math.max(10, (w * h) / 60000)));
+        stars = Array.from({ length: count }, () => makeStar(true));
+      }
+
+      // estrela de 4 pontas com lados curvos, como a da logo
+      function drawSparkle(s, alpha) {
+        const r = s.size, k = r * 0.18;
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.rot);
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(0, -r);
+        ctx.quadraticCurveTo(k, -k, r, 0);
+        ctx.quadraticCurveTo(k, k, 0, r);
+        ctx.quadraticCurveTo(-k, k, -r, 0);
+        ctx.quadraticCurveTo(-k, -k, 0, -r);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function frame(t) {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = 'rgba(255,255,255,0.8)';
+        ctx.shadowBlur = 6;
+        const time = t / 1000;
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          if (!still) {
+            s.x += s.vx;
+            s.y += s.vy;
+            s.rot += s.vrot;
+            if (s.y < -20 || s.x < -20 || s.x > w + 20) stars[i] = makeStar(false);
+          }
+          const twinkle = 0.5 + 0.5 * Math.sin(time * s.speed + s.phase);
+          drawSparkle(s, s.base * (0.35 + 0.65 * twinkle));
+        }
+        if (!still) requestAnimationFrame(frame);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(frame);
+    })();
+
+    /* ── Parceria: selos aparecem quando a seção entra na tela ── */
+    const parceriaStage = document.getElementById('parceriaStage');
+    new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in-view'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.3 }).observe(parceriaStage);
+
+    /* ── WhatsApp pop-up ── */
+    const waFloat = document.getElementById('waFloat');
+    const waPopup = document.getElementById('waPopup');
+    const waTyping = document.getElementById('waTyping');
+    const waBubble = document.getElementById('waBubble');
+    const WA_DELAY_MS = 6000;
+    let audioCtx = null;
+
+    // Navegadores só liberam som depois que a pessoa interage com a página
+    function unlockAudio() {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch (e) {}
+    }
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+      window.addEventListener(ev, unlockAudio, { once: true, passive: true })
+    );
+
+    function playNotification() {
+      try {
+        unlockAudio();
+        if (!audioCtx || audioCtx.state !== 'running') return false;
+        const now = audioCtx.currentTime;
+        [[880, 0], [1318.5, 0.12]].forEach(([freq, offset]) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, now + offset);
+          gain.gain.linearRampToValueAtTime(0.18, now + offset + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.45);
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.5);
+        });
+        return true;
+      } catch (e) { return false; }
+    }
+
+    function showWaPopup() {
+      waPopup.classList.add('show');
+      waFloat.classList.add('has-msg');
+      if (!playNotification()) {
+        // Som bloqueado: toca na primeira interação enquanto o pop-up estiver aberto
+        const retry = (e) => {
+          if (e.target.closest && e.target.closest('#waClose')) return;
+          if (waPopup.classList.contains('show')) setTimeout(playNotification, 50);
+        };
+        ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+          window.addEventListener(ev, retry, { once: true, passive: true })
+        );
+      }
+      setTimeout(() => {
+        waTyping.hidden = true;
+        waBubble.hidden = false;
+        const d = new Date();
+        document.getElementById('waTime').textContent =
+          String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      }, 1400);
+    }
+
+    function hideWaPopup() {
+      waPopup.classList.remove('show');
+      waFloat.classList.remove('has-msg');
+      try { sessionStorage.setItem('waPopupClosed', '1'); } catch (e) {}
+    }
+
+    document.getElementById('waClose').addEventListener('click', hideWaPopup);
+    let waClosed = false;
+    try { waClosed = sessionStorage.getItem('waPopupClosed') === '1'; } catch (e) {}
+    if (!waClosed) setTimeout(showWaPopup, LOADER_MS + WA_DELAY_MS);
+  </script>
+</body>
+</html>
